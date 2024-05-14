@@ -3,15 +3,20 @@ import json
 import os
 
 WEBOOK_URL = 'https://webhook.site/d9618ce6-8095-4343-96c7-1299cac0f0f9'
+url = 'https://hanqiu8.pythonanywhere.com/events'
+
+import requests
+
+def fetch_events(url):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Raises an HTTPError for bad responses (4xx or 5xx)
+        return response.json()  # Parse JSON response and return the data
+    except requests.RequestException as e:
+        print(f"An error occurred: {e}")
+        return None
 
 
-def load_data():
-    """ Load the webhook data from the file. """
-    if os.path.exists('webhook_data.json'):
-        with open('webhook_data.json', 'r') as f:
-            data = json.load(f)
-        return data
-    return "No data yet."
 
 def main():
     st.set_page_config(page_title="Bank Connector", layout="centered")
@@ -47,7 +52,7 @@ def main():
     else:
         st.empty()  # Clear previous content quickly
         st.markdown("<h1 style='text-align: center;'>Error</h1>", unsafe_allow_html=True)
-        data = load_data()
+        data = fetch_events(url='https://hanqiu8.pythonanywhere.com/events')
         st.write(data)
 
 if __name__ == "__main__":
