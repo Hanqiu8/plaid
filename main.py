@@ -1,9 +1,10 @@
 import streamlit as st
 import json
-import os
+import time
+import requests
 
 WEBOOK_URL = 'https://webhook.site/d9618ce6-8095-4343-96c7-1299cac0f0f9'
-url = 'https://hanqiu8.pythonanywhere.com/events'
+URL = 'https://hanqiu8.pythonanywhere.com/events'
 
 import requests
 
@@ -12,13 +13,24 @@ def fetch_events(url):
     try:
         response = requests.get(url)
         response.raise_for_status()  # Raises an HTTPError for bad responses (4xx or 5xx)
+        print(response.json())
         return response.json()  # Parse JSON response and return the data
     except requests.RequestException as e:
         print(f"An error occurred: {e}")
         return None
 
+@st.experimental_fragment
+def wait_for_webhook():
+    with st.spinner(text='Waiting for Webhook'):
+        while True:
+            data = fetch_events(URL)
+            if data:
+                st.success(data)
+                return
+            time.sleep(5)
+    
 
-import requests
+
 
 def get_known_issue():
     try:
@@ -29,11 +41,17 @@ def get_known_issue():
 }, data = json.dumps({"itemID": "64581ea558d4f200157fb90f"}))
         # Returning the status code and response content
         formatted_data = response.json()
-        return formatted_data[0]
+        return formatted_data['knownIssue']['title'], formatted_data['knownIssue']['plaidErrorCode']
     except requests.exceptions.RequestException as e:
         # Handling exceptions and returning the error
         return "Error: ", str(e)
 
+@st.experimental_fragment
+def follow_issue_button():
+    if st.button("FOLLOW ISSUE", type='primary'):
+        st.success("Following")
+        wait_for_webhook()
+    return False
 
 def main():
     st.set_page_config(page_title="Bank Connector", layout="centered")
@@ -56,6 +74,7 @@ def main():
         </style>
         """, unsafe_allow_html=True)
 
+
     # Initialize session state for showing error
     if 'show_error' not in st.session_state:
         st.session_state.show_error = False
@@ -69,15 +88,19 @@ def main():
         # Button triggers a fast state change
         if st.button("Connect"):
             st.session_state.show_error = True
+            st.rerun()
     else:
         st.empty()  # Clear previous content quickly
         st.markdown("<h1 style='text-align: center;'>Error</h1>", unsafe_allow_html=True)
         st.text("Institution Error")
-        data = ""
-        data = get_known_issue()
-        # while (len(data) < 10):
-        #     data = fetch_events(url='https://hanqiu8.pythonanywhere.com/events')
-        st.write(data)
+        with st.spinner(text='Checking for Known Issues'):
+            data, data2 = get_known_issue()
+        st.warning(data + '\n' + data2)
+        follow_issue_button()
+            
+
+
+    
 
 if __name__ == "__main__":
     main()
