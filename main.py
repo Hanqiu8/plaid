@@ -7,6 +7,7 @@ url = 'https://hanqiu8.pythonanywhere.com/events'
 
 import requests
 
+@st.experimental_fragment
 def fetch_events(url):
     try:
         response = requests.get(url)
@@ -17,6 +18,22 @@ def fetch_events(url):
         return None
 
 
+import requests
+
+def get_known_issue():
+    try:
+        # Sending a GET request to the URL
+        response = requests.post("https://api.dashboard.plaid.com/teams/5e1f7c6f21bd680011c481bf/known-issues", headers={
+    "Authorization": "Bearer 73d9372ea6636ec1c573705de81c089c",
+    "Content-Type": "application/json"
+}, data = json.dumps({"itemID": "64581ea558d4f200157fb90f"}))
+        # Returning the status code and response content
+        formatted_data = response.json()
+        return formatted_data[0]
+    except requests.exceptions.RequestException as e:
+        # Handling exceptions and returning the error
+        return "Error: ", str(e)
+
 
 def main():
     st.set_page_config(page_title="Bank Connector", layout="centered")
@@ -26,10 +43,12 @@ def main():
         <style>
         .main {
             margin: auto;
+            height: 700px;
             max-width: 400px;
-            border: 1px solid #eee;
-            border-radius: 5px;
+            border: 1px solid #aaa;
+            border-radius: 15px;
             padding: 10px;
+                
         }
         .block-container {
             padding: 2rem;
@@ -42,7 +61,8 @@ def main():
         st.session_state.show_error = False
 
     if not st.session_state.show_error:
-        st.title("Bank Connector")
+        st.title("Add Accounts")
+        st.image("./bank.png", width=55)
         banks = ["Bank of America", "Chase", "Wells Fargo", "Citi Bank", "US Bank"]
         bank_selected = st.radio("Select a bank:", banks)
 
@@ -52,7 +72,11 @@ def main():
     else:
         st.empty()  # Clear previous content quickly
         st.markdown("<h1 style='text-align: center;'>Error</h1>", unsafe_allow_html=True)
-        data = fetch_events(url='https://hanqiu8.pythonanywhere.com/events')
+        st.text("Institution Error")
+        data = ""
+        data = get_known_issue()
+        # while (len(data) < 10):
+        #     data = fetch_events(url='https://hanqiu8.pythonanywhere.com/events')
         st.write(data)
 
 if __name__ == "__main__":
