@@ -21,7 +21,7 @@ def fetch_events(url):
 
 @st.experimental_fragment
 def wait_for_webhook():
-    with st.spinner(text='Waiting for Webhook'):
+    with st.spinner(text='Waiting for Resolution Webhook'):
         while True:
             data = fetch_events(URL)
             if data:
@@ -79,8 +79,9 @@ def follow_issue_button():
             "walletTransactionIDs":[]
         }))
         # Returning the status code and response content
-        # formatted_data = response.json()
-        st.success(response.json()['case']['id'])
+        formatted_data = response.json()
+        st.success("Following Issue: " + response.json()['case']['id'])
+        # st.success("Following Issue:" + response)
         wait_for_webhook()
     return False
 
@@ -113,7 +114,7 @@ def main():
     if not st.session_state.show_error:
         st.title("Add Accounts")
         st.image("./bank.png", width=55)
-        banks = ["Bank of America", "Chase", "Wells Fargo", "Citi Bank", "US Bank"]
+        banks = ["Bank of America", "Chase", "Wells Fargo", "Citi Bank", "US Bank", "First National Bank of Omaha"]
         bank_selected = st.radio("Select a bank:", banks)
 
         # Button triggers a fast state change
@@ -123,8 +124,8 @@ def main():
     else:
         st.empty()  # Clear previous content quickly
         st.markdown("<h1 style='text-align: center;'>Error</h1>", unsafe_allow_html=True)
-        st.text("Institution Error")
         with st.spinner(text='Checking for Known Issues'):
+            time.sleep(3)
             data, data2 = get_known_issue()
         st.warning(data + '\n' + data2)
         follow_issue_button()
