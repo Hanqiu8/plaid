@@ -95,8 +95,8 @@ def main():
         <style>
         .main {
             margin: auto;
-            height: 800px;
-            max-width: 500px;
+            height: 700px;
+            max-width: 400px;
             border: 1px solid #ddd;
             border-radius: 15px;
             padding: 10px;
@@ -136,7 +136,7 @@ def main():
     #         st.rerun()
     # else:
     # st.empty()  # Clear previous content quickly
-    st.markdown("<h1 style='text-align: center;'>Error Linking Account</h1>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center;'>Error Linking Account</h2>", unsafe_allow_html=True)
     with st.spinner(text='Checking for Known Issues'):
         time.sleep(5)
         data, data2 = get_known_issue()
