@@ -51,39 +51,39 @@ def get_known_issue():
 @st.experimental_fragment
 def follow_issue_button():
     if st.button("Notify me", type='primary'):
-        # response = requests.post("https://api.dashboard.plaid.com/teams/5e1f7c6f21bd680011c481bf/cases", headers={
-        #     "Authorization": "Bearer 73d9372ea6636ec1c573705de81c089c",
-        #     "Content-Type": "application/json"
-        # }, data = json.dumps({
-        #     "useHtml": True,
-        #     "accessTokens":[],
-        #     "accountIDs":[],
-        #     "assetReportTokens":[],
-        #     "missingDataShownTransactionIDs":[],
-        #     "body":"<p>Hi Avi,</p><p><em>We are tracking your follow request for issue KI374487. You will be notified here once the issue is resolved.</em></p><br/><p><h5>Issue KI374456: Connections are timing out with FNBO Direct - Personal</h5></p><p>Connection attempts are timing out for some users connecting to FNBO Direct - Personal. Users encountering this issue will see an error indicating that the institution is not responding. The API request will result in the error INTERNAL_SERVER_ERROR</p>",
-        #     "investmentTransactionIDs":[],
-        #     "institutionID":"",
-        #     "institutionName":"",
-        #     "issueId":"374487",
-        #     "itemIDs":[],
-        #     "labels":["authentication-issues","known-issue"],
-        #     "minimumTransactionAmount":None,
-        #     "maximumTransactionAmount":None,
-        #     "paymentIDs":[],
-        #     "primaryCategory":"authentication-issues",
-        #     "requestIDs":["CZKYYPAkMGaL3r0"],
-        #     "secondaryCategory":"known-issue","subject":"Encountering issue KI374456",
-        #     "tags":[""],
-        #     "transactionIDs":[],
-        #     "type":"incident",
-        #     "uploads":[],
-        #     "virtualWalletIDs":[],
-        #     "walletTransactionIDs":[]
-        # }))
+        response = requests.post("https://api.dashboard.plaid.com/teams/5e1f7c6f21bd680011c481bf/cases", headers={
+            "Authorization": "Bearer 73d9372ea6636ec1c573705de81c089c",
+            "Content-Type": "application/json"
+        }, data = json.dumps({
+            "useHtml": True,
+            "accessTokens":[],
+            "accountIDs":[],
+            "assetReportTokens":[],
+            "missingDataShownTransactionIDs":[],
+            "body":"<p>Hi Avi,</p><p><em>We are tracking your follow request for issue KI374487. You will be notified here once the issue is resolved.</em></p><br/><p><h5>Issue KI374456: Connections are timing out with FNBO Direct - Personal</h5></p><p>Connection attempts are timing out for some users connecting to FNBO Direct - Personal. Users encountering this issue will see an error indicating that the institution is not responding. The API request will result in the error INTERNAL_SERVER_ERROR</p>",
+            "investmentTransactionIDs":[],
+            "institutionID":"",
+            "institutionName":"",
+            "issueId":"374487",
+            "itemIDs":[],
+            "labels":["authentication-issues","known-issue"],
+            "minimumTransactionAmount":None,
+            "maximumTransactionAmount":None,
+            "paymentIDs":[],
+            "primaryCategory":"authentication-issues",
+            "requestIDs":["CZKYYPAkMGaL3r0"],
+            "secondaryCategory":"known-issue","subject":"Encountering issue KI374456",
+            "tags":[""],
+            "transactionIDs":[],
+            "type":"incident",
+            "uploads":[],
+            "virtualWalletIDs":[],
+            "walletTransactionIDs":[]
+        }))
         # Returning the status code and response content
 
         # st.success(response.json()['case']['id'])
-        st.text("Following Issue:")
+        st.text("Following Issue: " + str(response.json()['case']['id']))
         wait_for_webhook()
     return False
 
