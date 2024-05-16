@@ -21,11 +21,13 @@ def fetch_events(url):
 
 @st.experimental_fragment
 def wait_for_webhook():
-    with st.spinner(text='Waiting for Resolution Webhook'):
+    with st.spinner(text='Waiting for Issue Resolution'):
         while True:
             data = fetch_events(URL)
             if data:
-                st.success(data)
+                st.empty()
+                st.success("Your issue has been resolved!")
+                st.button("Link Again")
                 return
             time.sleep(5)
     
@@ -48,40 +50,40 @@ def get_known_issue():
 
 @st.experimental_fragment
 def follow_issue_button():
-    if st.button("FOLLOW ISSUE", type='primary'):
-        response = requests.post("https://api.dashboard.plaid.com/teams/5e1f7c6f21bd680011c481bf/cases", headers={
-            "Authorization": "Bearer 73d9372ea6636ec1c573705de81c089c",
-            "Content-Type": "application/json"
-        }, data = json.dumps({
-            "useHtml": True,
-            "accessTokens":[],
-            "accountIDs":[],
-            "assetReportTokens":[],
-            "missingDataShownTransactionIDs":[],
-            "body":"<p>Hi Avi,</p><p><em>We are tracking your follow request for issue KI374487. You will be notified here once the issue is resolved.</em></p><br/><p><h5>Issue KI374456: Connections are timing out with FNBO Direct - Personal</h5></p><p>Connection attempts are timing out for some users connecting to FNBO Direct - Personal. Users encountering this issue will see an error indicating that the institution is not responding. The API request will result in the error INTERNAL_SERVER_ERROR</p>",
-            "investmentTransactionIDs":[],
-            "institutionID":"",
-            "institutionName":"",
-            "issueId":"374487",
-            "itemIDs":[],
-            "labels":["authentication-issues","known-issue"],
-            "minimumTransactionAmount":None,
-            "maximumTransactionAmount":None,
-            "paymentIDs":[],
-            "primaryCategory":"authentication-issues",
-            "requestIDs":["CZKYYPAkMGaL3r0"],
-            "secondaryCategory":"known-issue","subject":"Encountering issue KI374456",
-            "tags":[""],
-            "transactionIDs":[],
-            "type":"incident",
-            "uploads":[],
-            "virtualWalletIDs":[],
-            "walletTransactionIDs":[]
-        }))
+    if st.button("Notify me", type='primary'):
+        # response = requests.post("https://api.dashboard.plaid.com/teams/5e1f7c6f21bd680011c481bf/cases", headers={
+        #     "Authorization": "Bearer 73d9372ea6636ec1c573705de81c089c",
+        #     "Content-Type": "application/json"
+        # }, data = json.dumps({
+        #     "useHtml": True,
+        #     "accessTokens":[],
+        #     "accountIDs":[],
+        #     "assetReportTokens":[],
+        #     "missingDataShownTransactionIDs":[],
+        #     "body":"<p>Hi Avi,</p><p><em>We are tracking your follow request for issue KI374487. You will be notified here once the issue is resolved.</em></p><br/><p><h5>Issue KI374456: Connections are timing out with FNBO Direct - Personal</h5></p><p>Connection attempts are timing out for some users connecting to FNBO Direct - Personal. Users encountering this issue will see an error indicating that the institution is not responding. The API request will result in the error INTERNAL_SERVER_ERROR</p>",
+        #     "investmentTransactionIDs":[],
+        #     "institutionID":"",
+        #     "institutionName":"",
+        #     "issueId":"374487",
+        #     "itemIDs":[],
+        #     "labels":["authentication-issues","known-issue"],
+        #     "minimumTransactionAmount":None,
+        #     "maximumTransactionAmount":None,
+        #     "paymentIDs":[],
+        #     "primaryCategory":"authentication-issues",
+        #     "requestIDs":["CZKYYPAkMGaL3r0"],
+        #     "secondaryCategory":"known-issue","subject":"Encountering issue KI374456",
+        #     "tags":[""],
+        #     "transactionIDs":[],
+        #     "type":"incident",
+        #     "uploads":[],
+        #     "virtualWalletIDs":[],
+        #     "walletTransactionIDs":[]
+        # }))
         # Returning the status code and response content
-        formatted_data = response.json()
-        st.success("Following Issue: " + response.json()['case']['id'])
-        # st.success("Following Issue:" + response)
+
+        # st.success(response.json()['case']['id'])
+        st.text("Following Issue:")
         wait_for_webhook()
     return False
 
@@ -95,7 +97,7 @@ def main():
             margin: auto;
             height: 700px;
             max-width: 400px;
-            border: 1px solid #aaa;
+            border: 1px solid #ddd;
             border-radius: 15px;
             padding: 10px;
                 
@@ -103,32 +105,45 @@ def main():
         .block-container {
             padding: 2rem;
         }
+        .follow_issue_button {
+                height: 23px;
+        }
         </style>
         """, unsafe_allow_html=True)
 
-
     # Initialize session state for showing error
-    if 'show_error' not in st.session_state:
-        st.session_state.show_error = False
+    if 'link' not in st.session_state:
+        st.session_state.link = True
 
-    if not st.session_state.show_error:
-        st.title("Add Accounts")
-        st.image("./bank.png", width=55)
-        banks = ["Bank of America", "Chase", "Wells Fargo", "Citi Bank", "US Bank", "First National Bank of Omaha"]
-        bank_selected = st.radio("Select a bank:", banks)
-
-        # Button triggers a fast state change
-        if st.button("Connect"):
-            st.session_state.show_error = True
+    if st.session_state.link:
+        with st.spinner(text='Attempting to Link to account'):
+            col1, col2, col3 = st.columns([1,1,1])
+            with col2: 
+                st.image('./bank.png', width=55)
+            time.sleep(10)
+            st.session_state.link = False
             st.rerun()
-    else:
-        st.empty()  # Clear previous content quickly
-        st.markdown("<h1 style='text-align: center;'>Error</h1>", unsafe_allow_html=True)
-        with st.spinner(text='Checking for Known Issues'):
-            time.sleep(3)
-            data, data2 = get_known_issue()
-        st.warning(data + '\n' + data2)
-        follow_issue_button()
+
+    # if not st.session_state.show_error:
+    #     st.title("Add Accounts")
+    #     st.image("./bank.png", width=55)
+    #     banks = ["Bank of America", "Chase", "Wells Fargo", "Citi Bank", "US Bank", "First National Bank of Omaha"]
+    #     bank_selected = st.radio("Select a bank:", banks)
+
+    #     # Button triggers a fast state change
+    #     if st.button("Connect"):
+    #         st.session_state.show_error = True
+    #         st.rerun()
+    # else:
+    # st.empty()  # Clear previous content quickly
+    st.markdown("<h1 style='text-align: center;'>Error Attempting to Link</h1>", unsafe_allow_html=True)
+    with st.spinner(text='Checking for Known Issues'):
+        time.sleep(5)
+        data, data2 = get_known_issue()
+    # st.warning(data + '\n' + data2)
+    st.warning("Discovered Known Issue - connection issue to selected institution: FNBO")
+    follow_issue_button()
+
             
 
 
