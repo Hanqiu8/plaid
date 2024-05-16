@@ -50,7 +50,10 @@ def get_known_issue():
 
 @st.experimental_fragment
 def follow_issue_button():
-    if st.button("Notify me", type='primary'):
+    # st.text("We can notify you when this is fixed")
+    st.markdown("We can notify you when this is fixed"
+    )
+    if st.button("🔔 Notify me", type='primary'):
         response = requests.post("https://api.dashboard.plaid.com/teams/5e1f7c6f21bd680011c481bf/cases", headers={
             "Authorization": "Bearer 73d9372ea6636ec1c573705de81c089c",
             "Content-Type": "application/json"
@@ -141,7 +144,7 @@ def main():
         time.sleep(5)
         data, data2 = get_known_issue()
     # st.warning(data + '\n' + data2)
-    st.warning("Discovered Known Issue - connection issue to selected institution: FNBO")
+    st.warning("You're experiencing a known connection issue with FNBO", icon="⚠️")
     follow_issue_button()
 
             
